@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-python";
-import "ace-builds/src-noconflict/theme-tomorrow_night";
+import "ace-builds/src-noconflict/theme-tomorrow_night_bright";
 import "ace-builds/src-noconflict/theme-github";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -12,16 +12,16 @@ export default function Compiler() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [theme, setTheme] = useState("tomorrow_night");
+  const [theme, setTheme] = useState("tomorrow_night_bright");
 
   // Detect theme changes
   useEffect(() => {
     const isDarkMode = document.documentElement.classList.contains("dark");
-    setTheme(isDarkMode ? "tomorrow_night" : "github");
+    setTheme(isDarkMode ? "tomorrow_night_bright" : "github");
 
     const observer = new MutationObserver(() => {
       const newIsDarkMode = document.documentElement.classList.contains("dark");
-      setTheme(newIsDarkMode ? "tomorrow_night" : "github");
+      setTheme(newIsDarkMode ? "tomorrow_night_bright" : "github");
     });
     observer.observe(document.documentElement, {
       attributes: true,
