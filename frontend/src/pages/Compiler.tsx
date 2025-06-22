@@ -1,14 +1,35 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Editor } from "@monaco-editor/react";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/theme-tomorrow_night";
+import "ace-builds/src-noconflict/theme-github";
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Compiler() {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState("# Write Python code here");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [theme, setTheme] = useState("tomorrow_night");
+
+  // Detect theme changes
+  useEffect(() => {
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    setTheme(isDarkMode ? "tomorrow_night" : "github");
+
+    const observer = new MutationObserver(() => {
+      const newIsDarkMode = document.documentElement.classList.contains("dark");
+      setTheme(newIsDarkMode ? "tomorrow_night" : "github");
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const runCode = async () => {
     setLoading(true);
@@ -19,20 +40,27 @@ export default function Compiler() {
         language: "python",
       });
       setOutput(res.data.output || res.data.error);
-    } catch(error) {
+    } catch (error) {
       setOutput("Error in running output");
     }
     setLoading(false);
   };
+
   return (
     <div className="p-4 grid grid-cols-1 gap-4 max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold"> Online Python Compiler</h1>
-      <Editor
-        height="300px"
-        defaultLanguage="python"
+      <h1 className="text-2xl font-bold">Online Python Compiler</h1>
+      <AceEditor
+        mode="python"
+        theme={theme}
+        onChange={(value) => setCode(value)}
         value={code}
-        onChange={(value) => setCode(value || "")}
-        theme="vscode-dark"
+        height="300px"
+        width="100%"
+        setOptions={{
+          showLineNumbers: true,
+          tabSize: 4,
+          fontSize: 16,
+        }}
       />
       <Textarea
         placeholder="Enter your custom input"
@@ -40,11 +68,9 @@ export default function Compiler() {
         onChange={(e) => setInput(e.target.value)}
         className="h-24"
       />
-
       <Button onClick={runCode} disabled={loading}>
         {loading ? "Ruko Zaraa..." : "Run Code"}
       </Button>
-
       <Textarea
         value={output}
         readOnly
