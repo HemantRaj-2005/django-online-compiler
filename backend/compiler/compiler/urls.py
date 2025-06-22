@@ -16,8 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from code_execution.views import compile_code
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('compile/', compile_code, name='compile'),
+    path('api/compile/', compile_code, name='compile'),
 ]

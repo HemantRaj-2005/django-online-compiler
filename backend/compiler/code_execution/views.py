@@ -4,6 +4,7 @@ from rest_framework.response import Response
 import subprocess
 import os
 import uuid
+import tempfile
 
 # Create your views here.
 @api_view(['POST']) # to ensure it only accepts POST requests
@@ -13,7 +14,8 @@ def compile_code(request):
     user_input = request.data.get('input', '')
     uid = uuid.uuid4().hex
     filename = f'code_{uid}.py'
-    filepath = os.path.join('/tmp', filename)
+    temp_dir = tempfile.gettempdir()
+    filepath = os.path.join(temp_dir, filename)
 
 
     #step 2: Execute the code (for now I am giving service of python code execution only)
@@ -27,15 +29,15 @@ def compile_code(request):
         
         # Execute the code using subprocess
         result = subprocess.run(
-            ['python3', filepath],
-            input=user_input.encode(),
+            ['python', filepath],
+            input=user_input,
             text=True,
             capture_output=True,
             timeout=5  # Set a timeout to prevent hanging
         )
 
-        output = result.stdout.decode()
-        error = result.stderr.decode()
+        output = result.stdout
+        error = result.stderr
 
         return Response({
             "output": output,
@@ -44,6 +46,7 @@ def compile_code(request):
     except subprocess.TimeoutExpired:
         return Response({"error": "Code execution timed out"}, status=408)
     except Exception as e: # Catch any other exceptions
+        print("Error in compile_code:", e)
         return Response({"error": str(e)}, status=500)
     finally:
         # Clean up the temporary file
