@@ -34,7 +34,7 @@ export default function Compiler() {
   const runCode = async () => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8000/api/compile/", {
+      const res = await axios.post("https://django-online-compiler.onrender.com/api/compile/", {
         code,
         input,
         language: "python",
